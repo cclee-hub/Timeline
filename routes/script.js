@@ -58,25 +58,23 @@ function buildTimelineScript(data) {
     var s = document.createElement('style');
     s.id = 'timeline-style';
     s.textContent = [
-      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;width:100%;padding:24px 0;box-sizing:border-box}',
-      '.tl-title{text-align:center;color:#222;margin:0 0 20px;font-size:1.1rem;font-weight:700}',
-      '.tl-track{display:flex;align-items:stretch;overflow-x:auto;padding:0 16px}',
-      '.tl-item{display:flex;flex-direction:column;align-items:center;flex:1;min-width:120px;position:relative}',
-      '.tl-item:not(:last-child)::after{content:"";position:absolute;top:50%;left:50%;width:100%;height:2px;background:#ccc;z-index:0}',
-      '.tl-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px}',
-      '.tl-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px}',
-      '.tl-card-top,.tl-card-bottom{text-align:center;max-width:110px}',
-      '.tl-dot{width:12px;height:12px;background:#c8a84b;border-radius:50%;z-index:1;flex-shrink:0;margin:0}',
-      '.tl-axis{display:flex;align-items:center;width:100%;justify-content:center;position:relative;z-index:1}',
-      '.tl-line{flex:1;height:2px;background:#ccc}',
-      '.tl-date{font-size:.68rem;color:#888;font-weight:600;margin:0 0 2px}',
-      '.tl-item-title{font-size:.78rem;font-weight:700;color:#222;margin:0 0 2px;line-height:1.3}',
-      '.tl-item-desc{font-size:.7rem;color:#555;margin:0;line-height:1.3}'
+      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;width:100%;padding:16px 0;box-sizing:border-box;background:#fff}',
+      '.tl-title{text-align:center;color:#222;margin:0 0 24px;font-size:1.1rem;font-weight:700}',
+      '.tl-outer{position:relative;padding:60px 24px}',
+      '.tl-axis-line{position:absolute;top:50%;left:24px;right:24px;height:2px;background:#ccc;transform:translateY(-50%);z-index:0}',
+      '.tl-track{display:flex;align-items:center;position:relative;z-index:1}',
+      '.tl-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}',
+      '.tl-dot{width:12px;height:12px;background:#c8a84b;border-radius:50%;flex-shrink:0;z-index:2}',
+      '.tl-card{max-width:120px;text-align:center;position:absolute;left:50%;transform:translateX(-50%)}',
+      '.tl-card.top{bottom:calc(50% + 18px)}',
+      '.tl-card.bottom{top:calc(50% + 18px)}',
+      '.tl-date{font-size:.68rem;color:#888;font-weight:600;margin:0 0 2px;white-space:nowrap}',
+      '.tl-item-title{font-size:.75rem;font-weight:700;color:#222;margin:0 0 2px;line-height:1.3}',
+      '.tl-item-desc{font-size:.68rem;color:#555;margin:0;line-height:1.3}'
     ].join('');
     document.head.appendChild(s);
 
-    var html = '<div class="tl-title"></div><div class="tl-track"></div>';
-    container.innerHTML = html;
+    container.innerHTML = '<div class="tl-title"></div><div class="tl-outer"><div class="tl-axis-line"></div><div class="tl-track"></div></div>';
     if (title) container.querySelector('.tl-title').textContent = title;
 
     var track = container.querySelector('.tl-track');
@@ -84,10 +82,7 @@ function buildTimelineScript(data) {
       var isTop = i % 2 === 0;
       var div = document.createElement('div');
       div.className = 'tl-item';
-      div.innerHTML =
-        '<div class="tl-top">' + (isTop ? '<div class="tl-card-top"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>' : '') + '</div>' +
-        '<div class="tl-axis"><div class="tl-line"></div><div class="tl-dot"></div><div class="tl-line"></div></div>' +
-        '<div class="tl-bottom">' + (!isTop ? '<div class="tl-card-bottom"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>' : '') + '</div>';
+      div.innerHTML = '<div class="tl-dot"></div><div class="tl-card ' + (isTop ? 'top' : 'bottom') + '"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>';
       div.querySelector('.tl-date').textContent = item.date;
       div.querySelector('.tl-item-title').textContent = item.title;
       div.querySelector('.tl-item-desc').textContent = item.description;
