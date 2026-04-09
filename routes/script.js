@@ -54,46 +54,52 @@ function buildTimelineScript(data) {
     if (document.getElementById('timeline-root')) return;
     var container = document.createElement('div');
     container.id = 'timeline-root';
-    container.innerHTML = '<div class="tl-wrap">' +
-      (title ? '<h2 class="tl-title"></h2>' : '') +
-      '<div class="tl-list"></div></div>';
-    if (title) container.querySelector('.tl-title').textContent = title;
-    var target = document.querySelector('.product-container');
-    if (target) {
-      target.insertAdjacentElement('afterend', container);
-    } else {
-      document.body.appendChild(container);
-    }
 
     var s = document.createElement('style');
     s.id = 'timeline-style';
     s.textContent = [
-      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:16px 0;width:100%;float:none;display:block}',
-      '.tl-wrap{max-width:480px;margin:0}',
-      '.tl-title{text-align:left;color:#222;margin:0 0 16px;font-size:1.1rem;font-weight:700}',
-      '.tl-list{position:relative;padding:0 0 10px}',
-      '.tl-list::before{content:"";position:absolute;left:16px;top:0;bottom:0;width:2px;background:#ccc;transform:none}',
-      '.tl-item{display:flex;align-items:flex-start;margin:0 0 16px;position:relative;padding-left:44px}',
-      '.tl-item-left,.tl-item-right{width:100%;box-sizing:border-box;padding:0}',
-      '.tl-dot{position:absolute;left:10px;top:6px;width:12px;height:12px;background:#c8a84b;border-radius:50%;z-index:1}',
-      '.tl-card{background:transparent;border-radius:0;padding:0;box-shadow:none}',
-      '.tl-date{font-size:.72rem;color:#888;margin:0 0 2px;font-weight:600}',
-      '.tl-item-title{font-size:.9rem;font-weight:700;color:#222;margin:0 0 2px}',
-      '.tl-item-desc{font-size:.8rem;color:#555;margin:0;line-height:1.4}',
-      '@media(max-width:600px){.tl-list::before{left:16px}.tl-dot{left:10px}.tl-item{padding-left:44px}}'
+      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;width:100%;padding:24px 0;box-sizing:border-box}',
+      '.tl-title{text-align:center;color:#222;margin:0 0 20px;font-size:1.1rem;font-weight:700}',
+      '.tl-track{display:flex;align-items:stretch;overflow-x:auto;padding:0 16px}',
+      '.tl-item{display:flex;flex-direction:column;align-items:center;flex:1;min-width:120px;position:relative}',
+      '.tl-item:not(:last-child)::after{content:"";position:absolute;top:50%;left:50%;width:100%;height:2px;background:#ccc;z-index:0}',
+      '.tl-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px}',
+      '.tl-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px}',
+      '.tl-card-top,.tl-card-bottom{text-align:center;max-width:110px}',
+      '.tl-dot{width:12px;height:12px;background:#c8a84b;border-radius:50%;z-index:1;flex-shrink:0;margin:0}',
+      '.tl-axis{display:flex;align-items:center;width:100%;justify-content:center;position:relative;z-index:1}',
+      '.tl-line{flex:1;height:2px;background:#ccc}',
+      '.tl-date{font-size:.68rem;color:#888;font-weight:600;margin:0 0 2px}',
+      '.tl-item-title{font-size:.78rem;font-weight:700;color:#222;margin:0 0 2px;line-height:1.3}',
+      '.tl-item-desc{font-size:.7rem;color:#555;margin:0;line-height:1.3}'
     ].join('');
     document.head.appendChild(s);
 
-    var list = container.querySelector('.tl-list');
-    data.forEach(function(item) {
+    var html = '<div class="tl-title"></div><div class="tl-track"></div>';
+    container.innerHTML = html;
+    if (title) container.querySelector('.tl-title').textContent = title;
+
+    var track = container.querySelector('.tl-track');
+    data.forEach(function(item, i) {
+      var isTop = i % 2 === 0;
       var div = document.createElement('div');
       div.className = 'tl-item';
-      div.innerHTML = '<div class="tl-dot"></div><div class="tl-card"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>';
+      div.innerHTML =
+        '<div class="tl-top">' + (isTop ? '<div class="tl-card-top"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>' : '') + '</div>' +
+        '<div class="tl-axis"><div class="tl-line"></div><div class="tl-dot"></div><div class="tl-line"></div></div>' +
+        '<div class="tl-bottom">' + (!isTop ? '<div class="tl-card-bottom"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>' : '') + '</div>';
       div.querySelector('.tl-date').textContent = item.date;
       div.querySelector('.tl-item-title').textContent = item.title;
       div.querySelector('.tl-item-desc').textContent = item.description;
-      list.appendChild(div);
+      track.appendChild(div);
     });
+
+    var target = document.querySelector('.product-container');
+    if (target && target.parentNode) {
+      target.parentNode.insertBefore(container, target);
+    } else {
+      document.body.appendChild(container);
+    }
   }
 
   if (document.readyState === 'loading') {
