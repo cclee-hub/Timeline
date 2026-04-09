@@ -69,7 +69,7 @@ function buildTimelineScript(data) {
     s.id = 'timeline-style';
     s.textContent = [
       '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:16px 0;width:100%;float:left;clear:both}',
-      '.tl-wrap{max-width:480px;margin:0 auto}',
+      '.tl-wrap{max-width:480px;margin:0}',
       '.tl-title{text-align:left;color:#222;margin:0 0 16px;font-size:1.1rem;font-weight:700}',
       '.tl-list{position:relative;padding:0 0 10px}',
       '.tl-list::before{content:"";position:absolute;left:16px;top:0;bottom:0;width:2px;background:#ccc;transform:none}',
