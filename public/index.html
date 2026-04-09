@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeline Admin</title>
+  <link rel="icon" href="data:,">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; color: #222; min-height: 100vh; }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+    .card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .card h2 { font-size: 1.1rem; margin-bottom: 16px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .85rem; color: #666; margin-bottom: 4px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: .9rem; font-family: inherit; }
+    .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; }
+    .btn-primary { background: #4a90d9; color: #fff; }
+    .btn-primary:hover { background: #3a7fc8; }
+    .btn-danger { background: #e55; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .toggle-link { text-align: center; margin-top: 10px; font-size: .85rem; color: #666; }
+    .toggle-link a { color: #4a90d9; cursor: pointer; text-decoration: underline; }
+    #auth-section, #app-section { display: none; }
+    #auth-section.active, #app-section.active { display: block; }
+    .embed-box { background: #f0f4f8; border: 1px solid #dde; border-radius: 6px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+    .embed-box code { flex: 1; font-size: .8rem; overflow-x: auto; white-space: nowrap; color: #333; }
+    .item-row { display: grid; grid-template-columns: 130px 1fr 2fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
+    .item-row input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: .85rem; font-family: inherit; }
+    .item-row .btn { padding: 6px 12px; font-size: .8rem; }
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .header-row h2 { margin: 0; border: none; padding: 0; }
+    .items-container { margin-top: 16px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div id="auth-section" class="active">
+    <div class="card">
+      <h2 id="auth-title">登录</h2>
+      <div class="form-group"><label>用户名</label><input type="text" id="username"></div>
+      <div class="form-group"><label>密码</label><input type="password" id="password"></div>
+      <button class="btn btn-primary" onclick="handleAuth('login')">登录</button>
+      <button class="btn btn-secondary" onclick="handleAuth('register')">注册</button>
+    </div>
+  </div>
+
+  <div id="app-section">
+    <div class="header-row">
+      <h2>Timeline 管理后台</h2>
+      <button class="btn btn-secondary" onclick="logout()">退出</button>
+    </div>
+
+    <div class="card">
+      <h2>嵌入代码</h2>
+      <div class="embed-box">
+        <code id="embed-code"></code>
+        <button class="btn btn-primary" onclick="copyEmbed()">复制</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>时间轴设置</h2>
+      <div class="form-group"><label>标题</label><input type="text" id="timeline-title" placeholder="我的时间轴"></div>
+      <div class="items-container" id="items-list"></div>
+      <div style="margin-top:12px; display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="addItem()">+ 添加条目</button>
+        <button class="btn btn-primary" onclick="saveTimeline()">保存</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  var isRegister = false;
+  var token = localStorage.getItem('tl_token');
+  var userId = localStorage.getItem('tl_userId');
+  var username = localStorage.getItem('tl_username');
+  var items = [];
+
+  function $(id) { return document.getElementById(id); }
+
+    async function handleAuth(mode) {
+    var u = $('username').value.trim();
+    var p = $('password').value;
+    if (!u || !p) { alert('请填写用户名和密码'); return; }
+    isRegister = (mode === 'register');
+    var endpoint = isRegister ? '/api/register' : '/api/login';
+    var res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    var data = await res.json();
+    if (!res.ok) { alert(data.error || '请求失败'); return; }
+    if (isRegister) {
+      $('username').value = '';
+      $('password').value = '';
+      alert('注册成功，请登录');
+    } else {
+      token = data.token;
+      userId = data.userId;
+      username = data.username;
+      localStorage.setItem('tl_token', token);
+      localStorage.setItem('tl_userId', userId);
+      localStorage.setItem('tl_username', username);
+      showApp();
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('tl_token');
+    localStorage.removeItem('tl_userId');
+    localStorage.removeItem('tl_username');
+    token = userId = username = null;
+    $('auth-section').classList.add('active');
+    $('app-section').classList.remove('active');
+    $('username').value = '';
+    $('password').value = '';
+  }
+
+  function showApp() {
+    $('auth-section').classList.remove('active');
+    $('app-section').classList.add('active');
+    $('embed-code').textContent = '<script src="https://你的域名/tl.js?id=' + userId + '"><\/script>';
+    loadTimeline();
+  }
+
+  async function loadTimeline() {
+    var res = await fetch('/api/timeline', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var data = await res.json();
+    $('timeline-title').value = data ? (data.title || '') : '';
+    items = data && data.items ? data.items : [];
+    renderItems();
+  }
+
+  function renderItems() {
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      html += '<div class="item-row" data-index="' + i + '">' +
+        '<input type="text" placeholder="日期如2024-01" value="' + escAttr(item.date || '') + '" onchange="updateItem(' + i + ', \'date\', this.value)">' +
+        '<input type="text" placeholder="标题" value="' + escAttr(item.title || '') + '" onchange="updateItem(' + i + ', \'title\', this.value)">' +
+        '<input type="text" placeholder="描述" value="' + escAttr(item.description || '') + '" onchange="updateItem(' + i + ', \'description\', this.value)">' +
+        '<button class="btn btn-danger" onclick="removeItem(' + i + ')">删</button>' +
+      '</div>';
+    }
+    $('items-list').innerHTML = html;
+  }
+
+  function updateItem(i, field, val) { items[i][field] = val; }
+  function removeItem(i) { items.splice(i, 1); renderItems(); }
+
+  function addItem() {
+    items.push({ date: '', title: '', description: '' });
+    renderItems();
+  }
+
+  async function saveTimeline() {
+    var title = $('timeline-title').value.trim();
+    var res = await fetch('/api/timeline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ title: title, items: items })
+    });
+    if (!res.ok) { alert('保存失败'); return; }
+    alert('保存成功');
+    loadTimeline();
+  }
+
+  function copyEmbed() {
+    navigator.clipboard.writeText($('embed-code').textContent).then(function() { alert('已复制'); });
+  }
+
+  function escAttr(str) {
+    return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  if (token) showApp();
+</script>
+</body>
+</html>
