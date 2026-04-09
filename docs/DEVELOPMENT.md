@@ -139,7 +139,7 @@ Embed: `http://localhost:3000/tl.js`
 
 ### GET /tl.js?id=\<userId\>&tl=\<timelineId\>
 
-返回自包含 JavaScript，插入 `<div id="timeline-root">` 到 body，渲染垂直时间轴。
+返回自包含 JavaScript，插入 `<div id="timeline-root">` 到 `.product-container` 之前，渲染横向鱼骨式时间轴。
 
 **参数:**
 - `id` — 用户 ID（兼容旧方式）
