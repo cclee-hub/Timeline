@@ -58,10 +58,9 @@ function buildTimelineScript(data) {
       (title ? '<h2 class="tl-title"></h2>' : '') +
       '<div class="tl-list"></div></div>';
     if (title) container.querySelector('.tl-title').textContent = title;
-    // Find target and insert after it
-    var target = document.querySelector('.s123-content-area section');
+    var target = document.querySelector('.product-container');
     if (target && target.parentNode) {
-      target.parentNode.insertBefore(container, target.nextSibling);
+      target.parentNode.insertBefore(container, target);
     } else {
       document.body.appendChild(container);
     }
