@@ -133,7 +133,7 @@
   function showApp() {
     $('auth-section').classList.remove('active');
     $('app-section').classList.add('active');
-    $('embed-code').textContent = '<script src="https://your-domain.com/tl.js?id=' + userId + '"><\/script>';
+    $('embed-code').textContent = '<script src="' + window.location.origin + '/tl.js?id=' + userId + '"><\/script>';
     loadTimeline();
   }
 
