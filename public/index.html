@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,35 +39,35 @@
 
   <div id="auth-section" class="active">
     <div class="card">
-      <h2 id="auth-title">登录</h2>
-      <div class="form-group"><label>用户名</label><input type="text" id="username"></div>
-      <div class="form-group"><label>密码</label><input type="password" id="password"></div>
-      <button class="btn btn-primary" onclick="handleAuth('login')">登录</button>
-      <button class="btn btn-secondary" onclick="handleAuth('register')">注册</button>
+      <h2 id="auth-title">Login</h2>
+      <div class="form-group"><label>Username</label><input type="text" id="username"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="password"></div>
+      <button class="btn btn-primary" onclick="handleAuth('login')">Login</button>
+      <button class="btn btn-secondary" onclick="handleAuth('register')">Register</button>
     </div>
   </div>
 
   <div id="app-section">
     <div class="header-row">
-      <h2>Timeline 管理后台</h2>
-      <button class="btn btn-secondary" onclick="logout()">退出</button>
+      <h2>Timeline Admin</h2>
+      <button class="btn btn-secondary" onclick="logout()">Logout</button>
     </div>
 
     <div class="card">
-      <h2>嵌入代码</h2>
+      <h2>Embed Code</h2>
       <div class="embed-box">
         <code id="embed-code"></code>
-        <button class="btn btn-primary" onclick="copyEmbed()">复制</button>
+        <button class="btn btn-primary" onclick="copyEmbed()">Copy</button>
       </div>
     </div>
 
     <div class="card">
-      <h2>时间轴设置</h2>
-      <div class="form-group"><label>标题</label><input type="text" id="timeline-title" placeholder="我的时间轴"></div>
+      <h2>Timeline Settings</h2>
+      <div class="form-group"><label>Title</label><input type="text" id="timeline-title" placeholder="My Timeline"></div>
       <div class="items-container" id="items-list"></div>
       <div style="margin-top:12px; display:flex; gap:10px;">
-        <button class="btn btn-secondary" onclick="addItem()">+ 添加条目</button>
-        <button class="btn btn-primary" onclick="saveTimeline()">保存</button>
+        <button class="btn btn-secondary" onclick="addItem()">+ Add Entry</button>
+        <button class="btn btn-primary" onclick="saveTimeline()">Save</button>
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@
     async function handleAuth(mode) {
     var u = $('username').value.trim();
     var p = $('password').value;
-    if (!u || !p) { alert('请填写用户名和密码'); return; }
+    if (!u || !p) { alert('Please enter both username and password.'); return; }
     isRegister = (mode === 'register');
     var endpoint = isRegister ? '/api/register' : '/api/login';
     var res = await fetch(endpoint, {
@@ -94,11 +94,20 @@
       body: JSON.stringify({ username: u, password: p })
     });
     var data = await res.json();
-    if (!res.ok) { alert(data.error || '请求失败'); return; }
+    if (!res.ok) {
+      if (res.status === 401) {
+        alert('Oops! Incorrect username or password. Please try again or register a new account.');
+      } else if (res.status === 409) {
+        alert('This username is already taken. Please choose a different one.');
+      } else {
+        alert(data.error || 'Something went wrong. Please try again.');
+      }
+      return;
+    }
     if (isRegister) {
       $('username').value = '';
       $('password').value = '';
-      alert('注册成功，请登录');
+      alert('Registration successful! Please log in now.');
     } else {
       token = data.token;
       userId = data.userId;
@@ -124,7 +133,7 @@
   function showApp() {
     $('auth-section').classList.remove('active');
     $('app-section').classList.add('active');
-    $('embed-code').textContent = '<script src="https://你的域名/tl.js?id=' + userId + '"><\/script>';
+    $('embed-code').textContent = '<script src="https://your-domain.com/tl.js?id=' + userId + '"><\/script>';
     loadTimeline();
   }
 
@@ -143,10 +152,10 @@
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       html += '<div class="item-row" data-index="' + i + '">' +
-        '<input type="text" placeholder="日期如2024-01" value="' + escAttr(item.date || '') + '" onchange="updateItem(' + i + ', \'date\', this.value)">' +
-        '<input type="text" placeholder="标题" value="' + escAttr(item.title || '') + '" onchange="updateItem(' + i + ', \'title\', this.value)">' +
-        '<input type="text" placeholder="描述" value="' + escAttr(item.description || '') + '" onchange="updateItem(' + i + ', \'description\', this.value)">' +
-        '<button class="btn btn-danger" onclick="removeItem(' + i + ')">删</button>' +
+        '<input type="text" placeholder="Date (e.g. 2024-01)" value="' + escAttr(item.date || '') + '" onchange="updateItem(' + i + ', \'date\', this.value)">' +
+        '<input type="text" placeholder="Title" value="' + escAttr(item.title || '') + '" onchange="updateItem(' + i + ', \'title\', this.value)">' +
+        '<input type="text" placeholder="Description" value="' + escAttr(item.description || '') + '" onchange="updateItem(' + i + ', \'description\', this.value)">' +
+        '<button class="btn btn-danger" onclick="removeItem(' + i + ')">Del</button>' +
       '</div>';
     }
     $('items-list').innerHTML = html;
@@ -167,13 +176,13 @@
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ title: title, items: items })
     });
-    if (!res.ok) { alert('保存失败'); return; }
-    alert('保存成功');
+    if (!res.ok) { alert('Failed to save. Please try again.'); return; }
+    alert('Saved successfully!');
     loadTimeline();
   }
 
   function copyEmbed() {
-    navigator.clipboard.writeText($('embed-code').textContent).then(function() { alert('已复制'); });
+    navigator.clipboard.writeText($('embed-code').textContent).then(function() { alert('Copied to clipboard!'); });
   }
 
   function escAttr(str) {
