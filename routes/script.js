@@ -68,29 +68,27 @@ function buildTimelineScript(data) {
     var s = document.createElement('style');
     s.id = 'timeline-style';
     s.textContent = [
-      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px 0;width:100%;float:left;clear:both}',
-      '.tl-wrap{max-width:700px;margin:0 auto}',
-      '.tl-title{text-align:center;color:#222;margin:0 0 30px;font-size:1.5rem}',
-      '.tl-list{position:relative;padding:0 0 20px}',
-      '.tl-list::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#e0e0e0;transform:translateX(-50%)}',
-      '.tl-item{display:flex;margin:0 0 30px;position:relative}',
-      '.tl-item-left,.tl-item-right{width:50%;box-sizing:border-box;padding:0 20px}',
-      '.tl-dot{position:absolute;left:50%;top:8px;width:12px;height:12px;background:#4a90d9;border-radius:50%;transform:translateX(-50%);z-index:1}',
-      '.tl-card{background:#f9f9f9;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}',
-      '.tl-date{font-size:.75rem;color:#888;margin:0 0 6px;font-weight:600}',
-      '.tl-item-title{font-size:1rem;font-weight:600;color:#222;margin:0 0 6px}',
-      '.tl-item-desc{font-size:.875rem;color:#555;margin:0;line-height:1.5}',
-      '@media(max-width:600px){.tl-list::before{left:20px}.tl-dot{left:20px}.tl-item{flex-direction:column!important}.tl-item-left,.tl-item-right{width:100%;padding-left:50px;padding-right:0}}'
+      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:16px 0;width:100%;float:left;clear:both}',
+      '.tl-wrap{max-width:480px;margin:0 auto}',
+      '.tl-title{text-align:left;color:#222;margin:0 0 16px;font-size:1.1rem;font-weight:700}',
+      '.tl-list{position:relative;padding:0 0 10px}',
+      '.tl-list::before{content:"";position:absolute;left:16px;top:0;bottom:0;width:2px;background:#ccc;transform:none}',
+      '.tl-item{display:flex;align-items:flex-start;margin:0 0 16px;position:relative;padding-left:44px}',
+      '.tl-item-left,.tl-item-right{width:100%;box-sizing:border-box;padding:0}',
+      '.tl-dot{position:absolute;left:10px;top:6px;width:12px;height:12px;background:#c8a84b;border-radius:50%;z-index:1}',
+      '.tl-card{background:transparent;border-radius:0;padding:0;box-shadow:none}',
+      '.tl-date{font-size:.72rem;color:#888;margin:0 0 2px;font-weight:600}',
+      '.tl-item-title{font-size:.9rem;font-weight:700;color:#222;margin:0 0 2px}',
+      '.tl-item-desc{font-size:.8rem;color:#555;margin:0;line-height:1.4}',
+      '@media(max-width:600px){.tl-list::before{left:16px}.tl-dot{left:10px}.tl-item{padding-left:44px}}'
     ].join('');
     document.head.appendChild(s);
 
     var list = container.querySelector('.tl-list');
     data.forEach(function(item) {
-      var isOdd = list.children.length % 2 === 0;
-      var side = isOdd ? 'left' : 'right';
       var div = document.createElement('div');
       div.className = 'tl-item';
-      div.innerHTML = '<div class="tl-item-' + side + '"><div class="tl-dot"></div><div class="tl-card"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div></div>';
+      div.innerHTML = '<div class="tl-dot"></div><div class="tl-card"><p class="tl-date"></p><p class="tl-item-title"></p><p class="tl-item-desc"></p></div>';
       div.querySelector('.tl-date').textContent = item.date;
       div.querySelector('.tl-item-title').textContent = item.title;
       div.querySelector('.tl-item-desc').textContent = item.description;
