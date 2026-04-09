@@ -130,11 +130,18 @@
     $('password').value = '';
   }
 
+  var timelineId = null;
+
   function showApp() {
     $('auth-section').classList.remove('active');
     $('app-section').classList.add('active');
-    $('embed-code').textContent = '<script src="' + window.location.origin + '/tl.js?id=' + userId + '"><\/script>';
+    updateEmbedCode();
     loadTimeline();
+  }
+
+  function updateEmbedCode() {
+    var tlParam = timelineId ? '&tl=' + timelineId : '';
+    $('embed-code').textContent = '<script src="' + window.location.origin + '/tl.js?id=' + userId + tlParam + '"><\/script>';
   }
 
   async function loadTimeline() {
@@ -142,9 +149,11 @@
       headers: { 'Authorization': 'Bearer ' + token }
     });
     var data = await res.json();
+    if (data && data.id) timelineId = data.id;
     $('timeline-title').value = data ? (data.title || '') : '';
     items = data && data.items ? data.items : [];
     renderItems();
+    updateEmbedCode();
   }
 
   function renderItems() {
