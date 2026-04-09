@@ -68,7 +68,7 @@ function buildTimelineScript(data) {
     var s = document.createElement('style');
     s.id = 'timeline-style';
     s.textContent = [
-      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px 0}',
+      '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px 0;width:100%;float:left;clear:both}',
       '.tl-wrap{max-width:700px;margin:0 auto}',
       '.tl-title{text-align:center;color:#222;margin:0 0 30px;font-size:1.5rem}',
       '.tl-list{position:relative;padding:0 0 20px}',
