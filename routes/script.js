@@ -59,8 +59,7 @@ function buildTimelineScript(data) {
     s.id = 'timeline-style';
     s.textContent = [
       '#timeline-root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;width:100%;padding:16px 0;box-sizing:border-box;background:#fff}',
-      '.tl-title{text-align:center;color:#222;margin:0 0 24px;font-size:1.1rem;font-weight:700}',
-      '.tl-outer{position:relative;padding:60px 24px}',
+      '.tl-outer{position:relative;padding:80px 24px;box-sizing:border-box}',
       '.tl-axis-line{position:absolute;top:50%;left:24px;right:24px;height:2px;background:#ccc;transform:translateY(-50%);z-index:0}',
       '.tl-track{display:flex;align-items:center;position:relative;z-index:1}',
       '.tl-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}',
@@ -74,8 +73,7 @@ function buildTimelineScript(data) {
     ].join('');
     document.head.appendChild(s);
 
-    container.innerHTML = '<div class="tl-title"></div><div class="tl-outer"><div class="tl-axis-line"></div><div class="tl-track"></div></div>';
-    if (title) container.querySelector('.tl-title').textContent = title;
+    container.innerHTML = '<div class="tl-outer"><div class="tl-axis-line"></div><div class="tl-track"></div></div>';
 
     var track = container.querySelector('.tl-track');
     data.forEach(function(item, i) {
