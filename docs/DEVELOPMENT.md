@@ -120,7 +120,7 @@ Content-Type: `application/javascript`
 ## 嵌入使用
 
 ```html
-<script src="http://localhost:3000/tl.js?id=1"></script>
+<script src="https://timeline.aidevhub.ai/tl.js?id=1"></script>
 ```
 
 ---
