@@ -58,9 +58,14 @@ function buildTimelineScript(data) {
       (title ? '<h2 class="tl-title"></h2>' : '') +
       '<div class="tl-list"></div></div>';
     if (title) container.querySelector('.tl-title').textContent = title;
-    var containerEl = document.querySelector(".container");
-    if (containerEl && containerEl.parentNode) {
-      containerEl.parentNode.insertBefore(container, containerEl);
+    // Find best insertion point (priority order)
+    var insertEl =
+      document.querySelector('.container') ||
+      (document.querySelector('.product-container') && document.querySelector('.product-container').parentNode) ||
+      document.querySelector('main') ||
+      document.querySelector('#content');
+    if (insertEl && insertEl.parentNode) {
+      insertEl.parentNode.insertBefore(container, insertEl);
     } else {
       document.body.appendChild(container);
     }
