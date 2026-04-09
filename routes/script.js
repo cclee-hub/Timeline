@@ -5,14 +5,25 @@ const { getDb } = require('../db');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
+  const tlId = parseInt(req.query.tl, 10);
   const userId = parseInt(req.query.id, 10);
-  if (!userId) {
-    return res.type('application/javascript').send('/* invalid id */');
+
+  if (!tlId && !userId) {
+    return res.type('application/javascript').send('/* invalid id or tl required */');
   }
 
   try {
     const db = await getDb();
-    const result = db.exec('SELECT * FROM timelines WHERE user_id = ?', [userId]);
+    let result;
+
+    if (tlId) {
+      // tl parameter takes priority - query by timeline id
+      result = db.exec('SELECT * FROM timelines WHERE id = ?', [tlId]);
+    } else {
+      // Only id provided - query by user_id (backwards compatibility, get first)
+      result = db.exec('SELECT * FROM timelines WHERE user_id = ? LIMIT 1', [userId]);
+    }
+
     let data = null;
     if (result.length && result[0].values.length) {
       const row = result[0].values[0];

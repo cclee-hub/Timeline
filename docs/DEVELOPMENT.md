@@ -16,7 +16,7 @@ node server.js
 ```
 Timeline/
 ├── server.js           # Express 主入口，路由挂载
-├── db.js               # sql.js 数据库（异步单例）
+├── db.js               # sql.js 数据库（异步单例，含迁移逻辑）
 ├── package.json
 ├── timeline.db         # SQLite 数据文件（自动创建）
 ├── routes/
@@ -58,7 +58,6 @@ timelines (
 ```
 
 > 注意：`user_id` 无 UNIQUE 约束，允许同一用户创建多条时间轴。
-> `name` 为内部管理名称，`site_domain` 预留给前端使用（当前不存库）。
 
 ---
 
@@ -94,7 +93,7 @@ Embed: `http://localhost:3000/tl.js`
 **Response:**
 ```json
 [
-  { "id": 1, "name": "内部名称", "title": "标题", "items": [...], "site_domain": "", "updated_at": "..." },
+  { "id": 1, "user_id": 1, "name": "内部名称", "title": "标题", "items": [...], "site_domain": "", "updated_at": "..." },
   ...
 ]
 ```
@@ -105,7 +104,7 @@ Embed: `http://localhost:3000/tl.js`
 
 获取单条时间轴。需 `Authorization: Bearer <token>`
 
-**Response:** `{ "id", "name", "title", "items": [...], "site_domain", "updated_at" }`
+**Response:** `{ "id", "user_id", "name", "title", "items": [...], "site_domain", "updated_at" }`
 **Errors:** 404 不存在或不属于当前用户
 
 ---
@@ -114,9 +113,8 @@ Embed: `http://localhost:3000/tl.js`
 
 创建新时间轴。需 `Authorization: Bearer <token>`
 
-**Request:** `{ "name": "...", "title": "...", "items": [{ "date": "2024-01", "title": "...", "description": "..." }] }`
+**Request:** `{ "name": "...", "title": "...", "items": [...], "site_domain": "..." }`
 **Response:** `{ "id" }`
-**说明:** `name` 为空时使用 `title`，`title` 也为空时默认为 `'Untitled'`
 
 ---
 
@@ -124,8 +122,8 @@ Embed: `http://localhost:3000/tl.js`
 
 更新时间轴。需 `Authorization: Bearer <token>`
 
-**Request:** `{ "name": "...", "title": "...", "items": [...] }`
-**Response:** `{ "id", "name", "title", "items": [...], "updated_at" }`
+**Request:** `{ "name": "...", "title": "...", "items": [...], "site_domain": "..." }`
+**Response:** `{ "id" }`
 **Errors:** 404 不存在或不属于当前用户
 
 ---
@@ -161,8 +159,8 @@ Embed: `http://localhost:3000/tl.js`
 - 未登录：登录 / 注册切换表单
 - 已登录：基于 Hash 路由的 SPA
   - `#/list` — 时间轴列表页（显示所有时间轴，支持新建/编辑/删除）
-  - `#/edit/:id` — 编辑时间轴（内部名称、标题、条目）
   - `#/edit/new` — 新建时间轴
+  - `#/edit/:id` — 编辑时间轴（内部名称、标题、条目、域名）
   - Embed Code 区域：输入域名 + 路径，实时生成两段嵌入代码
 
 ### Embed Code 生成器
@@ -200,3 +198,4 @@ if (window.location.hostname === 'www.example.com' && window.location.pathname.s
 
 - `JWT_SECRET` 硬编码在 `routes/auth.js` 和 `routes/timeline.js`，生产环境应移至环境变量
 - `sql.js` 每次变更需调用 `saveDb()` 才能持久化
+- 数据库迁移：旧表结构（`user_id UNIQUE`，无 `name`/`site_domain` 列）会自动迁移到新结构

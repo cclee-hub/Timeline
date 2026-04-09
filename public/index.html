@@ -10,79 +10,150 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; color: #222; min-height: 100vh; }
     .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
     h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+    h2 { font-size: 1.1rem; margin-bottom: 16px; color: #333; }
     .card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
     .card h2 { font-size: 1.1rem; margin-bottom: 16px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: .85rem; color: #666; margin-bottom: 4px; }
     .form-group input, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: .9rem; font-family: inherit; }
-    .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4a90d9; }
+    .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; display: inline-block; }
     .btn-primary { background: #4a90d9; color: #fff; }
     .btn-primary:hover { background: #3a7fc8; }
     .btn-danger { background: #e55; color: #fff; }
+    .btn-danger:hover { background: #d44; }
     .btn-secondary { background: #eee; color: #333; }
+    .btn-secondary:hover { background: #ddd; }
+    .btn-sm { padding: 5px 12px; font-size: .8rem; }
     .toggle-link { text-align: center; margin-top: 10px; font-size: .85rem; color: #666; }
     .toggle-link a { color: #4a90d9; cursor: pointer; text-decoration: underline; }
-    #auth-section, #app-section { display: none; }
-    #auth-section.active, #app-section.active { display: block; }
-    .embed-box { background: #f0f4f8; border: 1px solid #dde; border-radius: 6px; padding: 12px; display: flex; gap: 10px; align-items: center; }
-    .embed-box code { flex: 1; font-size: .8rem; overflow-x: auto; white-space: nowrap; color: #333; }
-    .item-row { display: grid; grid-template-columns: 130px 1fr 2fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
-    .item-row input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: .85rem; font-family: inherit; }
-    .item-row .btn { padding: 6px 12px; font-size: .8rem; }
+    #auth-section, #list-section, #edit-section { display: none; }
+    #auth-section.active, #list-section.active, #edit-section.active { display: block; }
+    .embed-box { background: #f0f4f8; border: 1px solid #dde; border-radius: 6px; padding: 12px; display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .embed-box code { flex: 1; font-size: .8rem; overflow-x: auto; white-space: nowrap; color: #333; font-family: monospace; }
+    .embed-label { font-size: .75rem; color: #888; margin-bottom: 4px; }
+    .embed-preview { margin-top: 12px; }
+    .embed-row { margin-bottom: 16px; }
     .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .header-row h2 { margin: 0; border: none; padding: 0; }
     .items-container { margin-top: 16px; }
+    .item-row { display: grid; grid-template-columns: 130px 1fr 2fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
+    .item-row input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: .85rem; font-family: inherit; }
+    .item-row .btn { padding: 6px 12px; font-size: .8rem; }
+    .timeline-list { list-style: none; }
+    .timeline-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+    .timeline-list-item:last-child { border-bottom: none; }
+    .timeline-list-item .info { flex: 1; }
+    .timeline-list-item .name { font-weight: 600; color: #333; }
+    .timeline-list-item .meta { font-size: .8rem; color: #888; margin-top: 2px; }
+    .timeline-list-item .actions { display: flex; gap: 8px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+    .empty-state p { margin-bottom: 16px; }
+    .breadcrumb { margin-bottom: 16px; font-size: .85rem; color: #888; }
+    .breadcrumb a { color: #4a90d9; cursor: pointer; text-decoration: underline; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) {
+      .item-row { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 <div class="container">
 
-  <div id="auth-section" class="active">
+  <!-- Auth Section -->
+  <div id="auth-section">
     <div class="card">
       <h2 id="auth-title">Login</h2>
       <div class="form-group"><label>Username</label><input type="text" id="username"></div>
       <div class="form-group"><label>Password</label><input type="password" id="password"></div>
       <button class="btn btn-primary" onclick="handleAuth('login')">Login</button>
       <button class="btn btn-secondary" onclick="handleAuth('register')">Register</button>
+      <div class="toggle-link"><a onclick="toggleAuth()">Switch to <span id="auth-toggle-text">Register</span></a></div>
     </div>
   </div>
 
-  <div id="app-section">
+  <!-- List Section -->
+  <div id="list-section">
     <div class="header-row">
-      <h2>Timeline Admin</h2>
+      <h2>My Timelines</h2>
       <button class="btn btn-secondary" onclick="logout()">Logout</button>
+    </div>
+    <div class="card">
+      <div id="timeline-list-container"></div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="navigate('edit/new')">+ New Timeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Section -->
+  <div id="edit-section">
+    <div class="header-row">
+      <h2 id="edit-title">Edit Timeline</h2>
+      <button class="btn btn-secondary" onclick="navigate('list')">Back</button>
     </div>
 
     <div class="card">
-      <h2>Embed Code</h2>
-      <div class="embed-box">
-        <code id="embed-code"></code>
-        <button class="btn btn-primary" onclick="copyEmbed()">Copy</button>
+      <h2>Timeline Info</h2>
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input type="text" id="tl-name" placeholder="my-timeline"></div>
+        <div class="form-group"><label>Title</label><input type="text" id="tl-title" placeholder="My Timeline"></div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Timeline Settings</h2>
-      <div class="form-group"><label>Title</label><input type="text" id="timeline-title" placeholder="My Timeline"></div>
+      <h2>Entries</h2>
       <div class="items-container" id="items-list"></div>
       <div style="margin-top:12px; display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="addItem()">+ Add Entry</button>
         <button class="btn btn-primary" onclick="saveTimeline()">Save</button>
       </div>
     </div>
+
+    <div class="card">
+      <h2>Embed Code</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Domain</label>
+          <input type="text" id="embed-domain" placeholder="https://www.example.com" oninput="updateEmbedCodes()">
+        </div>
+        <div class="form-group">
+          <label>Path</label>
+          <input type="text" id="embed-path" placeholder="/events" oninput="updateEmbedCodes()">
+        </div>
+      </div>
+      <div class="embed-preview">
+        <div class="embed-label">Pure Embed (paste before &lt;/body&gt;):</div>
+        <div class="embed-box">
+          <code id="embed-pure"></code>
+          <button class="btn btn-primary btn-sm" onclick="copyText('embed-pure')">Copy</button>
+        </div>
+        <div class="embed-label">Conditional Embed (only runs on specified path):</div>
+        <div class="embed-box">
+          <code id="embed-conditional"></code>
+          <button class="btn btn-primary btn-sm" onclick="copyText('embed-conditional')">Copy</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
 <script>
+  // State
   var isRegister = false;
   var token = localStorage.getItem('tl_token');
   var userId = localStorage.getItem('tl_userId');
   var username = localStorage.getItem('tl_username');
+  var timelines = [];
+  var currentId = null;
   var items = [];
 
+  // DOM helpers
   function $(id) { return document.getElementById(id); }
 
-    async function handleAuth(mode) {
+  // Auth
+  async function handleAuth(mode) {
     var u = $('username').value.trim();
     var p = $('password').value;
     if (!u || !p) { alert('Please enter both username and password.'); return; }
@@ -96,7 +167,7 @@
     var data = await res.json();
     if (!res.ok) {
       if (res.status === 401) {
-        alert('Oops! Incorrect username or password. Please try again or register a new account.');
+        alert('Incorrect username or password. Please try again or register a new account.');
       } else if (res.status === 409) {
         alert('This username is already taken. Please choose a different one.');
       } else {
@@ -108,6 +179,7 @@
       $('username').value = '';
       $('password').value = '';
       alert('Registration successful! Please log in now.');
+      toggleAuth();
     } else {
       token = data.token;
       userId = data.userId;
@@ -115,8 +187,14 @@
       localStorage.setItem('tl_token', token);
       localStorage.setItem('tl_userId', userId);
       localStorage.setItem('tl_username', username);
-      showApp();
+      navigate('list');
     }
+  }
+
+  function toggleAuth() {
+    isRegister = !isRegister;
+    $('auth-title').textContent = isRegister ? 'Register' : 'Login';
+    $('auth-toggle-text').textContent = isRegister ? 'Login' : 'Register';
   }
 
   function logout() {
@@ -124,36 +202,117 @@
     localStorage.removeItem('tl_userId');
     localStorage.removeItem('tl_username');
     token = userId = username = null;
+    navigate('list');
+    showAuth();
+  }
+
+  function showAuth() {
     $('auth-section').classList.add('active');
-    $('app-section').classList.remove('active');
-    $('username').value = '';
-    $('password').value = '';
+    $('list-section').classList.remove('active');
+    $('edit-section').classList.remove('active');
   }
 
-  var timelineId = null;
+  // Routing
+  function navigate(hash) {
+    window.location.hash = '/' + hash;
+  }
 
-  function showApp() {
+  function getRoute() {
+    var hash = window.location.hash.replace('#', '') || 'list';
+    var parts = hash.split('/');
+    return { page: parts[0] || 'list', id: parts[1] || null };
+  }
+
+  function router() {
+    if (!token) {
+      showAuth();
+      return;
+    }
+    var route = getRoute();
     $('auth-section').classList.remove('active');
-    $('app-section').classList.add('active');
-    updateEmbedCode();
-    loadTimeline();
+    $('list-section').classList.remove('active');
+    $('edit-section').classList.remove('active');
+
+    if (route.page === 'list') {
+      $('list-section').classList.add('active');
+      loadTimelineList();
+    } else if (route.page === 'edit') {
+      $('edit-section').classList.add('active');
+      loadTimelineForEdit(route.id);
+    }
   }
 
-  function updateEmbedCode() {
-    var tlParam = timelineId ? '&tl=' + timelineId : '';
-    $('embed-code').textContent = '<script src="' + window.location.origin + '/tl.js?id=' + userId + tlParam + '"><\/script>';
-  }
+  window.addEventListener('hashchange', router);
 
-  async function loadTimeline() {
-    var res = await fetch('/api/timeline', {
+  // Timeline List
+  async function loadTimelineList() {
+    var res = await fetch('/api/timelines', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    var data = await res.json();
-    if (data && data.id) timelineId = data.id;
-    $('timeline-title').value = data ? (data.title || '') : '';
-    items = data && data.items ? data.items : [];
+    if (!res.ok) { alert('Failed to load timelines.'); return; }
+    timelines = await res.json();
+    renderTimelineList();
+  }
+
+  function renderTimelineList() {
+    var container = $('timeline-list-container');
+    if (timelines.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No timelines yet. Create your first one!</p></div>';
+      return;
+    }
+    var html = '<ul class="timeline-list">';
+    for (var i = 0; i < timelines.length; i++) {
+      var tl = timelines[i];
+      var date = tl.updated_at ? new Date(tl.updated_at).toLocaleDateString() : 'No date';
+      html += '<li class="timeline-list-item">' +
+        '<div class="info">' +
+          '<div class="name">' + escHtml(tl.name || 'Untitled') + '</div>' +
+          '<div class="meta">' + escHtml(tl.title || '') + ' | Updated ' + date + '</div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<button class="btn btn-secondary btn-sm" onclick="navigate(\'edit/' + tl.id + '\')">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteTimeline(' + tl.id + ')">Delete</button>' +
+        '</div>' +
+      '</li>';
+    }
+    html += '</ul>';
+    container.innerHTML = html;
+  }
+
+  async function deleteTimeline(id) {
+    if (!confirm('Delete this timeline? This cannot be undone.')) return;
+    var res = await fetch('/api/timeline/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) { alert('Failed to delete timeline.'); return; }
+    loadTimelineList();
+  }
+
+  // Edit
+  async function loadTimelineForEdit(id) {
+    currentId = (id === 'new') ? null : id;
+    $('edit-title').textContent = currentId ? 'Edit Timeline' : 'New Timeline';
+    $('tl-name').value = '';
+    $('tl-title').value = '';
+    $('embed-domain').value = '';
+    $('embed-path').value = '/events';
+    items = [];
     renderItems();
-    updateEmbedCode();
+
+    if (currentId) {
+      var res = await fetch('/api/timeline/' + currentId, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) { alert('Failed to load timeline.'); navigate('list'); return; }
+      var data = await res.json();
+      $('tl-name').value = data.name || '';
+      $('tl-title').value = data.title || '';
+      $('embed-domain').value = data.site_domain || '';
+      items = data.items || [];
+      renderItems();
+    }
+    updateEmbedCodes();
   }
 
   function renderItems() {
@@ -164,7 +323,7 @@
         '<input type="text" placeholder="Date (e.g. 2024-01)" value="' + escAttr(item.date || '') + '" onchange="updateItem(' + i + ', \'date\', this.value)">' +
         '<input type="text" placeholder="Title" value="' + escAttr(item.title || '') + '" onchange="updateItem(' + i + ', \'title\', this.value)">' +
         '<input type="text" placeholder="Description" value="' + escAttr(item.description || '') + '" onchange="updateItem(' + i + ', \'description\', this.value)">' +
-        '<button class="btn btn-danger" onclick="removeItem(' + i + ')">Del</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="removeItem(' + i + ')">Del</button>' +
       '</div>';
     }
     $('items-list').innerHTML = html;
@@ -179,26 +338,72 @@
   }
 
   async function saveTimeline() {
-    var title = $('timeline-title').value.trim();
-    var res = await fetch('/api/timeline', {
-      method: 'POST',
+    var name = $('tl-name').value.trim();
+    var title = $('tl-title').value.trim();
+    var site_domain = $('embed-domain').value.trim();
+    if (!name) { alert('Please enter a name.'); return; }
+
+    var method = currentId ? 'PUT' : 'POST';
+    var url = currentId ? '/api/timeline/' + currentId : '/api/timeline';
+    var res = await fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ title: title, items: items })
+      body: JSON.stringify({ name: name, title: title, items: items, site_domain: site_domain })
     });
     if (!res.ok) { alert('Failed to save. Please try again.'); return; }
+    var data = await res.json();
     alert('Saved successfully!');
-    loadTimeline();
+    if (!currentId) {
+      navigate('edit/' + data.id);
+    } else {
+      loadTimelineForEdit(currentId);
+    }
   }
 
-  function copyEmbed() {
-    navigator.clipboard.writeText($('embed-code').textContent).then(function() { alert('Copied to clipboard!'); });
+  // Embed Code
+  function updateEmbedCodes() {
+    var base = window.location.origin;
+    var domain = $('embed-domain').value.trim();
+    var path = $('embed-path').value.trim() || '/events';
+    var tlId = currentId || '';
+    var user = userId || '';
+
+    // Pure embed
+    var pure = '<script src="' + base + '/tl.js?id=' + user + '&tl=' + tlId + '"><\/script>';
+    $('embed-pure').textContent = pure;
+
+    // Conditional embed
+    var hostname = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    var cond = '<script>\n' +
+      'if (window.location.hostname === \'' + hostname + '\' && window.location.pathname.startsWith(\'' + path + '\')) {\n' +
+      '  var s = document.createElement(\'script\');\n' +
+      '  s.src = \'' + base + '/tl.js?id=' + user + '&tl=' + tlId + '\';\n' +
+      '  document.body.appendChild(s);\n' +
+      '}\n' +
+      '<\/script>';
+    $('embed-conditional').textContent = cond;
   }
 
+  function copyText(id) {
+    var text = $(id).textContent;
+    navigator.clipboard.writeText(text).then(function() { alert('Copied to clipboard!'); });
+  }
+
+  // Utilities
   function escAttr(str) {
     return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  if (token) showApp();
+  function escHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Init
+  if (token) {
+    router();
+  } else {
+    showAuth();
+  }
 </script>
 </body>
 </html>
