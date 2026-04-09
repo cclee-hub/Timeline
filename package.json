@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Timeline embed service",
   "main": "server.js",
-  "// test": "workflow test",
+  "// test": "workflow trigger test",
   "scripts": {
     "start": "node server.js"
   },
