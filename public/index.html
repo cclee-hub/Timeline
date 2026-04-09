@@ -219,7 +219,7 @@
 
   function getRoute() {
     var hash = window.location.hash.replace('#', '') || 'list';
-    var parts = hash.split('/');
+    var parts = hash.split('/').filter(Boolean);
     return { page: parts[0] || 'list', id: parts[1] || null };
   }
 
